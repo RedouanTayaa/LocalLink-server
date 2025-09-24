@@ -1,0 +1,114 @@
+services:
+    # --------------------
+    # Docker Registry privé
+    # --------------------
+    registry:
+        image: registry:3.0
+        container_name: registry
+        restart: always
+        ports:
+            - "5000:5000"
+        environment:
+            REGISTRY_STORAGE_DELETE_ENABLED: "true"
+        volumes:
+            - ../registry:/var/lib/registry
+
+    # --------------------
+    # API Symfony + FrankenPHP
+    # --------------------
+    api:
+        image: localhost:5000/locallink-api:latest
+        container_name: symfony-api
+        restart: always
+        ports:
+            - "80:80"   # Caddy écoutera aussi sur 443 automatiquement
+            - "443:443"
+        environment:
+            APP_ENV: prod
+            DATABASE_URL: "postgresql://${USER_DB}:${PASS_DB}@host.docker.internal:5432/${NAME_DB}"
+        volumes:
+            - ../api/var:/app/var
+            - caddy_data:/data  # Persistance des certificats
+            - caddy_config:/config
+        networks:
+            - appnet
+
+    # --------------------
+    # Front Next.js SSR
+    # --------------------
+    front:
+        image: localhost:5000/locallink-front:latest
+        container_name: nextjs-front
+        restart: always
+        environment:
+            NODE_ENV: production
+            API_URL: ${API_URL}
+            FRONT_URL: ${FRONT_URL}
+        networks:
+            - appnet
+
+    # --------------------
+    # Monitoring
+    # --------------------
+    node-exporter:
+        image: prom/node-exporter:v1.9.1
+        network_mode: "host"
+        restart: always
+
+    cadvisor:
+        image: gcr.io/cadvisor/cadvisor:0.52.0
+        ports:
+            - "8080:8080"
+        volumes:
+            - /:/rootfs:ro
+            - /var/run:/var/run:ro
+            - /sys:/sys:ro
+            - /var/lib/docker/:/var/lib/docker:ro
+        restart: always
+
+    prometheus:
+        image: prom/prometheus:v3.5.0
+        ports:
+            - "9090:9090"
+        volumes:
+            - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+        restart: always
+
+    grafana:
+        image: grafana/grafana:12.3.0-17718666199
+        container_name: grafana
+        restart: always
+        ports:
+            - "3001:3000"
+        volumes:
+            - ../monitoring/grafana:/var/lib/grafana
+            - ../monitoring/grafana/provisioning:/etc/grafana/provisioning
+        environment:
+            GF_SECURITY_ADMIN_USER: admin
+            GF_SECURITY_ADMIN_PASSWORD: admin
+
+    loki:
+        image: grafana/loki:2.9.0
+        ports:
+            - "3100:3100"
+        volumes:
+            - ../monitoring/loki-config.yaml:/etc/loki/local-config.yaml
+        restart: always
+
+    alloy:
+        image: grafana/alloy:v1.10.2
+        container_name: grafana-alloy
+        volumes:
+            - /var/lib/docker/containers:/var/lib/docker/containers:ro
+            - ../api/var/log:/srv/api/var/log:ro
+            - ../monitoring/alloy-config.alloy:/etc/alloy/config.alloy
+        command: [ "run", "/etc/alloy/config.alloy" ]
+        restart: always
+
+volumes:
+    caddy_data:
+    caddy_config:
+
+networks:
+    appnet:
+        driver: bridge

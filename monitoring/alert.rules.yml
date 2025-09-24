@@ -1,0 +1,76 @@
+groups:
+    - name: general-alerts
+      rules:
+          # 🔴 Alerte si une instance ne répond plus
+          - alert: InstanceDown
+            expr: up == 0
+            for: 1m
+            labels:
+                severity: critical
+            annotations:
+                summary: "Instance {{ $labels.instance }} down"
+                description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute."
+
+    - name: node-health
+      rules:
+          # 🔴 CPU trop élevé (> 90% pendant 5 min)
+          - alert: HighCPUUsage
+            expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+            for: 5m
+            labels:
+                severity: warning
+            annotations:
+                summary: "High CPU usage on {{ $labels.instance }}"
+                description: "CPU usage is above 90% for the last 5 minutes."
+
+          # 🔴 RAM trop élevée (> 90% pendant 5 min)
+          - alert: HighMemoryUsage
+            expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 90
+            for: 5m
+            labels:
+                severity: warning
+            annotations:
+                summary: "High Memory usage on {{ $labels.instance }}"
+                description: "Memory usage is above 90% for the last 5 minutes."
+
+          # 🔴 Espace disque faible (< 10% disponible)
+          - alert: LowDiskSpace
+            expr: (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"}) * 100 < 10
+            for: 10m
+            labels:
+                severity: critical
+            annotations:
+                summary: "Low disk space on {{ $labels.instance }} ({{ $labels.device }})"
+                description: "Disk space is below 10% for more than 10 minutes."
+
+    - name: container-health
+      rules:
+          # 🔴 Container arrêté (up=0 pour cadvisor metrics)
+          - alert: ContainerDown
+            expr: absent(container_last_seen{image!=""})
+            for: 1m
+            labels:
+                severity: critical
+            annotations:
+                summary: "A container is missing"
+                description: "One or more containers have not been seen by cAdvisor for more than 1 minute."
+
+          # 🔴 Container consomme trop de CPU (> 80% pendant 5 min)
+          - alert: ContainerHighCPU
+            expr: (rate(container_cpu_usage_seconds_total{image!=""}[5m]) * 100) > 0.8
+            for: 5m
+            labels:
+                severity: warning
+            annotations:
+                summary: "High CPU usage for container {{ $labels.name }}"
+                description: "Container {{ $labels.name }} has used more than 80% CPU for the last 5 minutes."
+
+          # 🔴 Container consomme trop de mémoire (> 80%)
+          - alert: ContainerHighMemory
+            expr: (container_memory_usage_bytes{image!=""} / container_spec_memory_limit_bytes{image!=""}) > 0.8
+            for: 5m
+            labels:
+                severity: warning
+            annotations:
+                summary: "High Memory usage for container {{ $labels.name }}"
+                description: "Container {{ $labels.name }} is using more than 80% of its memory limit."

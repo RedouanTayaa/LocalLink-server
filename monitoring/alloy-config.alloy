@@ -1,0 +1,34 @@
+loki.write "default" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+
+local.file_match "docker_logs" {
+  path_targets = [{
+    __path__ = "/var/lib/docker/containers/*/*.log"
+    job       = "docker"
+  }]
+}
+
+local.file_match "symfony_logs" {
+  path_targets = [{
+    __path__ = "/srv/api/var/log/*.log"
+    job       = "symfony-api"
+  }]
+}
+
+loki.source.file "docker" {
+  targets    = local.file_match.docker_logs.targets
+  forward_to = [loki.write.default.receiver]
+}
+
+loki.source.file "symfony" {
+  targets    = local.file_match.symfony_logs.targets
+  pipeline {
+    stage.regex {
+      expression = ".*(ERROR|CRITICAL).*"
+    }
+  }
+  forward_to = [loki.write.default.receiver]
+}
