@@ -45,7 +45,7 @@ jobs:
               env:
                   SERVER_HOST: ${{ secrets.SERVER_HOST }}
                   SERVER_USER: ${{ secrets.SERVER_USER }}
-                  SERVER_PATH: ${{ secrets.SERVER_PATH }}
+                  SERVER_PATH: ${{ secrets.SERVER_PATH_DEPLOY }}
                   SSH_PORT: ${{ secrets.SSH_PORT }}
               run: |
                   ssh -p $SSH_PORT $SERVER_USER@$SERVER_HOST << 'ENDSSH'
