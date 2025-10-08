@@ -16,36 +16,36 @@ services:
     # --------------------
     # API Symfony + FrankenPHP
     # --------------------
-    api:
-        image: localhost:5000/locallink-api:latest
-        container_name: symfony-api
-        restart: always
-        ports:
-            - "80:80"   # Caddy écoutera aussi sur 443 automatiquement
-            - "443:443"
-        environment:
-            APP_ENV: prod
-            DATABASE_URL: "postgresql://${USER_DB}:${PASS_DB}@host.docker.internal:5432/${NAME_DB}"
-        volumes:
-            - ../api/var:/app/var
-            - caddy_data:/data  # Persistance des certificats
-            - caddy_config:/config
-        networks:
-            - appnet
+#    api:
+#        image: localhost:5000/locallink-api:latest
+#        container_name: symfony-api
+#        restart: always
+#        ports:
+#            - "8080:80"
+#            - "8443:443"
+#        environment:
+#            APP_ENV: prod
+#        volumes:
+#            - ../api/var:/app/var
+#            - caddy_data:/data  # Persistance des certificats
+#            - caddy_config:/config
+#            - ./backend/.env.local:/var/www/html/.env.local:ro
+#        networks:
+#            - locallink-network
 
     # --------------------
     # Front Next.js SSR
     # --------------------
-    front:
-        image: localhost:5000/locallink-front:latest
-        container_name: nextjs-front
-        restart: always
-        environment:
-            NODE_ENV: production
-            API_URL: ${API_URL}
-            FRONT_URL: ${FRONT_URL}
-        networks:
-            - appnet
+#    front:
+#        image: localhost:5000/locallink-front:latest
+#        container_name: nextjs-front
+#        restart: always
+#        environment:
+#            NODE_ENV: production
+#            NEXT_PUBLIC_API_URL: API_URL
+#            NEXT_PUBLIC_DOMAIN: FRONT_URL
+#        networks:
+#            - locallink-network
 
     # --------------------
     # Monitoring
@@ -84,8 +84,8 @@ services:
             - ../monitoring/grafana:/var/lib/grafana
             - ../monitoring/grafana/provisioning:/etc/grafana/provisioning
         environment:
-            GF_SECURITY_ADMIN_USER: admin
-            GF_SECURITY_ADMIN_PASSWORD: admin
+            GF_SECURITY_ADMIN_USER: GF_ADMIN_USER
+            GF_SECURITY_ADMIN_PASSWORD: GF_ADMIN_PASSWORD
 
     loki:
         image: grafana/loki:2.9.0
@@ -110,5 +110,5 @@ volumes:
     caddy_config:
 
 networks:
-    appnet:
+    locallink-network:
         driver: bridge

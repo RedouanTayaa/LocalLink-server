@@ -1,0 +1,91 @@
+name: Deploy Server Configuration
+
+on:
+    push:
+        branches: ["master"]
+    pull_request:
+        branches: ["master"]
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v5.0.0
+
+            - name: Setup SSH
+              uses: webfactory/ssh-agent@v0.9.1
+              with:
+                  ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+            - name: Add server to known hosts
+              run: |
+                  mkdir -p ~/.ssh
+                  ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+            - name: Deploy configuration to server
+              env:
+                  SERVER_HOST: ${{ secrets.SERVER_HOST }}
+                  SERVER_USER: ${{ secrets.SERVER_USER }}
+                  SERVER_PATH: ${{ secrets.SERVER_PATH }}
+                  SSH_PORT: ${{ secrets.SSH_PORT }}
+              run: |
+                  # Synchroniser les fichiers de configuration
+                  rsync -avz --delete -e "ssh -p $SSH_PORT" \
+                    --exclude '.git' \
+                    --exclude '.github' \
+                    --exclude 'README.md' \
+                    ./ $SERVER_USER@$SERVER_HOST:$SERVER_PATH/
+
+            - name: Restart services via SSH
+              env:
+                  SERVER_HOST: ${{ secrets.SERVER_HOST }}
+                  SERVER_USER: ${{ secrets.SERVER_USER }}
+                  SERVER_PATH: ${{ secrets.SERVER_PATH }}
+                  SSH_PORT: ${{ secrets.SSH_PORT }}
+              run: |
+                  ssh -p $SSH_PORT $SERVER_USER@$SERVER_HOST << 'ENDSSH'
+                    cd $SERVER_PATH
+                  
+                    # Arrêter les services existants
+                    docker compose down
+                  
+                    # Remplacer les chaines avec les bonnes valeurs
+                    sed -i "s/nom-domaine.com/${{ secrets.DOMAIN_NAME }}/g" ../api/Caddyfile
+                    sed -i "s|API_URL: .*|API_URL: ${{ secrets.API_URL }}|g" docker-compose.yml
+                    sed -i "s|FRONT_URL: .*|FRONT_URL: ${{ secrets.FRONT_URL }}|g" docker-compose.yml
+                    sed -i "s|GF_ADMIN_USER: .*|GF_ADMIN_USER: ${{ secrets.FRONT_URL }}|g" docker-compose.yml
+                    sed -i "s|GF_ADMIN_PASSWORD: .*|GF_ADMIN_PASSWORD: ${{ secrets.GF_ADMIN_PASSWORD }}|g" docker-compose.yml
+                    sed -i "s|URL_SLACK_WEBHOOK|${{ secrets.SLACK_WEBHOOK_URL }}|g" ../monitoring/alertmanager.yml
+                  
+                    # Recréer et démarrer tous les services
+                    docker compose up -d --force-recreate
+                  
+                    # Nettoyer les images non utilisées
+                    docker image prune -f
+                  
+                    # Afficher le statut des services
+                    docker compose ps
+                  ENDSSH
+
+            - name: Verify deployment
+              env:
+                  SERVER_HOST: ${{ secrets.SERVER_HOST }}
+                  SERVER_USER: ${{ secrets.SERVER_USER }}
+                  SERVER_PATH: ${{ secrets.SERVER_PATH_DEPLOY }}
+                  SSH_PORT: ${{ secrets.SSH_PORT }}
+              run: |
+                  ssh -p $SSH_PORT $SERVER_USER@$SERVER_HOST << 'ENDSSH'
+                    cd $SERVER_PATH
+                  
+                    # Vérifier que tous les services sont bien démarrés
+                    if [ $(docker compose ps --services --filter "status=running" | wc -l) -eq $(docker compose ps --services | wc -l) ]; then
+                      echo "✅ Tous les services sont démarrés"
+                      exit 0
+                    else
+                      echo "❌ Certains services ne sont pas démarrés"
+                      docker compose ps
+                      exit 1
+                    fi
+                  ENDSSH
