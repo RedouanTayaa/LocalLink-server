@@ -13,6 +13,8 @@ services:
             REGISTRY_STORAGE_DELETE_ENABLED: "true"
         volumes:
             - ../registry:/var/lib/registry
+        networks:
+            - locallink-network
 
     # --------------------
     # API Symfony + FrankenPHP
@@ -55,6 +57,8 @@ services:
         image: prom/node-exporter:v1.9.1
         network_mode: "host"
         restart: always
+        networks:
+            - locallink-network
 
     cadvisor:
         image: gcr.io/cadvisor/cadvisor:v0.52.0
@@ -66,6 +70,8 @@ services:
             - /sys:/sys:ro
             - /var/lib/docker/:/var/lib/docker:ro
         restart: always
+        networks:
+            - locallink-network
 
     prometheus:
         image: prom/prometheus:v3.5.0
@@ -74,6 +80,8 @@ services:
         volumes:
             - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
         restart: always
+        networks:
+            - locallink-network
 
     grafana:
         image: grafana/grafana:12.3.0-17718666199
@@ -88,6 +96,8 @@ services:
         environment:
             GF_SECURITY_ADMIN_USER: GF_ADMIN_USER
             GF_SECURITY_ADMIN_PASSWORD: GF_ADMIN_PASSWORD
+        networks:
+            - locallink-network
 
     loki:
         image: grafana/loki:2.9.0
@@ -101,6 +111,8 @@ services:
             - ../monitoring/loki/chunks:/loki/chunks
             - ../monitoring/loki/wal:/wal
         restart: always
+        networks:
+            - locallink-network
 
     alloy:
         image: grafana/alloy:v1.10.2
@@ -111,6 +123,8 @@ services:
             - ../monitoring/alloy-config.alloy:/etc/alloy/config.alloy
         command: [ "run", "/etc/alloy/config.alloy" ]
         restart: always
+        networks:
+            - locallink-network
 
 volumes:
     caddy_data:
