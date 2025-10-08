@@ -59,7 +59,7 @@ services:
     cadvisor:
         image: gcr.io/cadvisor/cadvisor:v0.52.0
         ports:
-            - "8080:8080"
+            - "8085:8080"
         volumes:
             - /:/rootfs:ro
             - /var/run:/var/run:ro
@@ -93,8 +93,12 @@ services:
         image: grafana/loki:2.9.0
         ports:
             - "3100:3100"
+        user: USER_LOCAL
         volumes:
             - ../monitoring/loki-config.yaml:/etc/loki/local-config.yaml
+            - ../monitoring/loki/index:/loki/index
+            - ../monitoring/loki/cache:/loki/cache
+            - ../monitoring/loki/chunks:/loki/chunks
         restart: always
 
     alloy:
