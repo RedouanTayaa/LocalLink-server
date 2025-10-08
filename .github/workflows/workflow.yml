@@ -55,7 +55,7 @@ jobs:
                     docker compose down
                   
                     # Remplacer les chaines avec les bonnes valeurs
-                    sed -i "s/nom-domaine.com/${{ secrets.DOMAIN_NAME }}/g" ../api/Caddyfile
+                    #sed -i "s/nom-domaine.com/${{ secrets.DOMAIN_NAME }}/g" ../api/Caddyfile
                     sed -i "s|API_URL: .*|API_URL: ${{ secrets.API_URL }}|g" docker-compose.yml
                     sed -i "s|FRONT_URL: .*|FRONT_URL: ${{ secrets.FRONT_URL }}|g" docker-compose.yml
                     sed -i "s|GF_ADMIN_USER: .*|GF_ADMIN_USER: ${{ secrets.FRONT_URL }}|g" docker-compose.yml
