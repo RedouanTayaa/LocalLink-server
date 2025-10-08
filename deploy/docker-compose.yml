@@ -78,6 +78,7 @@ services:
         image: grafana/grafana:12.3.0-17718666199
         container_name: grafana
         restart: always
+        user: USER
         ports:
             - "3001:3000"
         volumes:
