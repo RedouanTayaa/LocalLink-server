@@ -1,5 +1,8 @@
 auth_enabled: false
 
+compactor:
+    working_directory: /wal
+
 server:
     http_listen_port: 3100
 
