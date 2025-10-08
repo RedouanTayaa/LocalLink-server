@@ -25,10 +25,8 @@ loki.source.file "docker" {
 
 loki.source.file "symfony" {
   targets    = local.file_match.symfony_logs.targets
-  pipeline {
-    stage.regex {
-      expression = ".*(ERROR|CRITICAL).*"
-    }
+  stage.regex {
+    expression = ".*(ERROR|CRITICAL).*"
   }
   forward_to = [loki.write.default.receiver]
 }
