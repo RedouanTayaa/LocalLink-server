@@ -39,6 +39,8 @@ jobs:
                     --exclude '.git' \
                     --exclude '.github' \
                     --exclude 'README.md' \
+                    --exclude '../api/var/log' \
+                    --exclude '../api/var/cache' \
                     ./ $SERVER_USER@$SERVER_HOST:$SERVER_PATH/
 
             - name: Restart services via SSH
@@ -80,7 +82,6 @@ jobs:
                   SERVER_PATH: ${{ secrets.SERVER_PATH_DEPLOY }}
                   SSH_PORT: ${{ secrets.SSH_PORT }}
               run: |
-                  set -e
                   ssh -p $SSH_PORT $SERVER_USER@$SERVER_HOST << ENDSSH
                     cd $SERVER_PATH
                     RUNNING=$(docker compose ps --services --filter "status=running" | wc -l)

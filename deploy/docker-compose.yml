@@ -102,10 +102,9 @@ services:
     alloy:
         image: grafana/alloy:v1.10.2
         container_name: grafana-alloy
-        user: USER_LOCAL
         volumes:
             - /var/lib/docker/containers:/var/lib/docker/containers:ro
-            - ../api/var/log:/srv/api/var/log:ro
+#            - ../api/var/log:/srv/api/var/log:ro
             - ../monitoring/alloy-config.alloy:/etc/alloy/config.alloy
         command: [ "run", "/etc/alloy/config.alloy" ]
         restart: always
