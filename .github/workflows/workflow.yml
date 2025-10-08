@@ -20,9 +20,12 @@ jobs:
                   ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
             - name: Add server to known hosts
+              env:
+                  SERVER_HOST: ${{ secrets.SERVER_HOST }}
+                  SSH_PORT: ${{ secrets.SSH_PORT }}
               run: |
                   mkdir -p ~/.ssh
-                  ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+                  ssh-keyscan -p $SSH_PORT -H $SERVER_HOST >> ~/.ssh/known_hosts
 
             - name: Deploy configuration to server
               env:
