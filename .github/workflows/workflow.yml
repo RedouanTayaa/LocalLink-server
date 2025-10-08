@@ -48,10 +48,9 @@ jobs:
                   SERVER_PATH: ${{ secrets.SERVER_PATH_DEPLOY }}
                   SSH_PORT: ${{ secrets.SSH_PORT }}
               run: |
-                  ssh -p $SSH_PORT $SERVER_USER@$SERVER_HOST << 'ENDSSH'
+                  ssh -p $SSH_PORT $SERVER_USER@$SERVER_HOST << ENDSSH
                     cd $SERVER_PATH
-                    ls -l ./
-                    ls -l ../
+                    echo "➡️ Current path:" && pwd
                   
                     # Arrêter les services existants
                     docker compose down
@@ -81,7 +80,7 @@ jobs:
                   SERVER_PATH: ${{ secrets.SERVER_PATH_DEPLOY }}
                   SSH_PORT: ${{ secrets.SSH_PORT }}
               run: |
-                  ssh -p $SSH_PORT $SERVER_USER@$SERVER_HOST << 'ENDSSH'
+                  ssh -p $SSH_PORT $SERVER_USER@$SERVER_HOST << ENDSSH
                     cd $SERVER_PATH
                   
                     # Vérifier que tous les services sont bien démarrés
