@@ -82,18 +82,20 @@ jobs:
                   SERVER_PATH: ${{ secrets.SERVER_PATH_DEPLOY }}
                   SSH_PORT: ${{ secrets.SSH_PORT }}
               run: |
-                  ssh -p $SSH_PORT $SERVER_USER@$SERVER_HOST << ENDSSH
-                    cd $SERVER_PATH
-                    RUNNING=$(docker compose -f $SERVER_PATH/docker-compose.yml ps --services --filter "status=running" | wc -l)
-                    TOTAL=$(docker compose -f $SERVER_PATH/docker-compose.yml ps --services | wc -l)
-
-                    echo "Running: $RUNNING / Total: $TOTAL"
-
-                    if [ "$RUNNING" -eq "$TOTAL" ]; then
-                      echo "✅ Tous les services sont démarrés"
+                  ssh -p $SSH_PORT $SERVER_USER@$SERVER_HOST bash << ENDSSH
+                    set -e  # Arrête en cas d'erreur
+                    cd "$SERVER_PATH"
+                    
+                    RUNNING=\$(docker compose ps --services --filter "status=running" | wc -l)
+                    TOTAL=\$(docker compose ps --services | wc -l)
+                    
+                    echo "Running: \$RUNNING / Total: \$TOTAL"
+                    
+                    if [ "\$RUNNING" -eq "\$TOTAL" ] && [ "\$TOTAL" -gt 0 ]; then
+                    echo "✅ Tous les services sont démarrés"
                     else
-                      echo "❌ Certains services ne sont pas démarrés"
-                      docker compose -f $SERVER_PATH/docker-compose.yml ps
-                      exit 1
+                    echo "❌ Certains services ne sont pas démarrés"
+                    docker compose ps
+                    exit 1
                     fi
                   ENDSSH
