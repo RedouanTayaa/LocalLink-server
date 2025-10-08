@@ -69,7 +69,6 @@ services:
 
     prometheus:
         image: prom/prometheus:v3.5.0
-        user: USER_LOCAL
         ports:
             - "9090:9090"
         volumes:
@@ -92,7 +91,6 @@ services:
 
     loki:
         image: grafana/loki:2.9.0
-        user: USER_LOCAL
         ports:
             - "3100:3100"
         volumes:

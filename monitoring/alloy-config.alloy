@@ -6,15 +6,15 @@ loki.write "default" {
 
 local.file_match "docker_logs" {
   path_targets = [{
-    __path__ = "/var/lib/docker/containers/*/*.log"
-    job       = "docker"
+    __path__ = "/var/lib/docker/containers/*/*.log",
+    job       = "docker",
   }]
 }
 
 local.file_match "symfony_logs" {
   path_targets = [{
-    __path__ = "/srv/api/var/log/*.log"
-    job       = "symfony-api"
+    __path__ = "/srv/api/var/log/*.log",
+    job       = "symfony-api",
   }]
 }
 
