@@ -6,6 +6,7 @@ services:
         image: registry:3.0
         container_name: registry
         restart: always
+        user: USER
         ports:
             - "5000:5000"
         environment:
@@ -68,6 +69,7 @@ services:
 
     prometheus:
         image: prom/prometheus:v3.5.0
+        user: USER
         ports:
             - "9090:9090"
         volumes:
@@ -90,6 +92,7 @@ services:
 
     loki:
         image: grafana/loki:2.9.0
+        user: USER
         ports:
             - "3100:3100"
         volumes:
@@ -99,6 +102,7 @@ services:
     alloy:
         image: grafana/alloy:v1.10.2
         container_name: grafana-alloy
+        user: USER
         volumes:
             - /var/lib/docker/containers:/var/lib/docker/containers:ro
             - ../api/var/log:/srv/api/var/log:ro
