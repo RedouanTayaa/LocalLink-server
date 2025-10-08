@@ -50,6 +50,8 @@ jobs:
               run: |
                   ssh -p $SSH_PORT $SERVER_USER@$SERVER_HOST << 'ENDSSH'
                     cd $SERVER_PATH
+                    ls -l ./
+                    ls -l ../
                   
                     # Arrêter les services existants
                     docker compose down
