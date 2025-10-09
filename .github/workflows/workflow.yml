@@ -45,6 +45,7 @@ jobs:
                     --exclude '../monitoring/loki/cache' \
                     --exclude '../monitoring/loki/chunks' \
                     --exclude '../monitoring/loki/wal' \
+                    --exclude '../registry' \
                     ./ $SERVER_USER@$SERVER_HOST:$SERVER_PATH/
 
             - name: Restart services via SSH
