@@ -36,16 +36,15 @@ jobs:
               run: |
                   # Synchroniser les fichiers de configuration
                   rsync -avz --delete -e "ssh -p $SSH_PORT" \
-                    --exclude '.git' \
-                    --exclude '.github' \
+                    --exclude '.git/' \
+                    --exclude '.github/' \
                     --exclude 'README.md' \
-                    --exclude '../api' \
-                    --exclude '../front' \
-                    --exclude '../monitoring/loki/index' \
-                    --exclude '../monitoring/loki/cache' \
-                    --exclude '../monitoring/loki/chunks' \
-                    --exclude '../monitoring/loki/wal' \
-                    --exclude '../registry' \
+                    --exclude 'registry/' \
+                    --exclude 'api/' \
+                    --exclude 'front/' \
+                    --exclude 'monitoring/loki/' \
+                    --exclude 'monitoring/grafana/data/' \
+                    --exclude 'monitoring/prometheus/data/' \
                     ./ $SERVER_USER@$SERVER_HOST:$SERVER_PATH/
 
             - name: Restart services via SSH
