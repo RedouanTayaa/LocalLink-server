@@ -58,7 +58,7 @@ jobs:
                     cd $SERVER_PATH
                   
                     # Arrêter les services existants
-                    docker compose down
+                    docker compose pull
                   
                     # Remplacer les chaines avec les bonnes valeurs
                     #sed -i "s/nom-domaine.com/${{ secrets.DOMAIN_NAME }}/g" ../api/Caddyfile
@@ -70,7 +70,7 @@ jobs:
                     sed -i "s|URL_SLACK_WEBHOOK|${{ secrets.SLACK_WEBHOOK_URL }}|g" ../monitoring/alertmanager.yml
                   
                     # Recréer et démarrer tous les services
-                    docker compose up -d --force-recreate
+                    docker compose up -d
                   
                     # Nettoyer les images non utilisées
                     docker image prune -f
