@@ -11,10 +11,19 @@ services:
             - "5000:5000"
         environment:
             REGISTRY_STORAGE_DELETE_ENABLED: "true"
+            REGISTRY_STORAGE_CACHE_BLOBDESCRIPTOR: "inmemory"
+            REGISTRY_HTTP_HOST: "http://localhost:5000"
+            REGISTRY_VALIDATION_DISABLED: "true"
+            REGISTRY_LOG_LEVEL: "info"
         volumes:
             - ../registry:/var/lib/registry
         networks:
             - locallink-network
+        healthcheck:
+            test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5000/v2/" ]
+            interval: 10s
+            timeout: 5s
+            retries: 3
 
     # --------------------
     # API Symfony + FrankenPHP
@@ -35,6 +44,9 @@ services:
             - ./backend/.env.local:/var/www/html/.env.local:ro
         networks:
             - locallink-network
+        depends_on:
+            registry:
+                condition: service_healthy
 
     # --------------------
     # Front Next.js SSR
@@ -49,6 +61,9 @@ services:
             NEXT_PUBLIC_DOMAIN: FRONT_URL
         networks:
             - locallink-network
+        depends_on:
+            registry:
+                condition: service_healthy
 
     # --------------------
     # Monitoring
