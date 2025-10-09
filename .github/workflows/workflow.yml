@@ -39,8 +39,12 @@ jobs:
                     --exclude '.git' \
                     --exclude '.github' \
                     --exclude 'README.md' \
-                    --exclude '../api/var/log' \
-                    --exclude '../api/var/cache' \
+                    --exclude '../api' \
+                    --exclude '../front' \
+                    --exclude '../monitoring/loki/index' \
+                    --exclude '../monitoring/loki/cache' \
+                    --exclude '../monitoring/loki/chunks' \
+                    --exclude '../monitoring/loki/wal' \
                     ./ $SERVER_USER@$SERVER_HOST:$SERVER_PATH/
 
             - name: Restart services via SSH

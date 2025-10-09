@@ -19,36 +19,36 @@ services:
     # --------------------
     # API Symfony + FrankenPHP
     # --------------------
-#    api:
-#        image: localhost:5000/locallink-api:latest
-#        container_name: symfony-api
-#        restart: always
-#        ports:
-#            - "8080:80"
-#            - "8443:443"
-#        environment:
-#            APP_ENV: prod
-#        volumes:
-#            - ../api/var:/app/var
-#            - caddy_data:/data  # Persistance des certificats
-#            - caddy_config:/config
-#            - ./backend/.env.local:/var/www/html/.env.local:ro
-#        networks:
-#            - locallink-network
+    api:
+        image: localhost:5000/locallink-api:latest
+        container_name: symfony-api
+        restart: always
+        ports:
+            - "8080:80"
+            - "8443:443"
+        environment:
+            APP_ENV: prod
+        volumes:
+            - ../api/var:/app/var
+            - caddy_data:/data
+            - caddy_config:/config
+            - ./backend/.env.local:/var/www/html/.env.local:ro
+        networks:
+            - locallink-network
 
     # --------------------
     # Front Next.js SSR
     # --------------------
-#    front:
-#        image: localhost:5000/locallink-front:latest
-#        container_name: nextjs-front
-#        restart: always
-#        environment:
-#            NODE_ENV: production
-#            NEXT_PUBLIC_API_URL: API_URL
-#            NEXT_PUBLIC_DOMAIN: FRONT_URL
-#        networks:
-#            - locallink-network
+    front:
+        image: localhost:5000/locallink-front:latest
+        container_name: nextjs-front
+        restart: always
+        environment:
+            NODE_ENV: production
+            NEXT_PUBLIC_API_URL: API_URL
+            NEXT_PUBLIC_DOMAIN: FRONT_URL
+        networks:
+            - locallink-network
 
     # --------------------
     # Monitoring
