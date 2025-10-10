@@ -12,7 +12,6 @@ services:
         environment:
             REGISTRY_STORAGE_DELETE_ENABLED: "true"
             REGISTRY_STORAGE_CACHE_BLOBDESCRIPTOR: "inmemory"
-            REGISTRY_HTTP_HOST: "http://localhost:5000"
             REGISTRY_VALIDATION_DISABLED: "true"
             REGISTRY_LOG_LEVEL: "info"
         volumes:
@@ -132,7 +131,7 @@ services:
         container_name: grafana-alloy
         volumes:
             - /var/lib/docker/containers:/var/lib/docker/containers:ro
-#            - ../api/var/log:/srv/api/var/log:ro
+            - ../api/var/log:/srv/api/var/log:ro
             - ../monitoring/alloy-config.alloy:/etc/alloy/config.alloy
         command: [ "run", "/etc/alloy/config.alloy" ]
         restart: always

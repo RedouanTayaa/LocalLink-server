@@ -61,7 +61,7 @@ jobs:
                     docker compose pull
                   
                     # Remplacer les chaines avec les bonnes valeurs
-                    #sed -i "s/nom-domaine.com/${{ secrets.DOMAIN_NAME }}/g" ../api/Caddyfile
+                    sed -i "s/nom-domaine.com/${{ secrets.DOMAIN_NAME }}/g" ../api/Caddyfile
                     sed -i "s|NEXT_PUBLIC_API_URL: .*|NEXT_PUBLIC_API_URL: ${{ secrets.API_URL }}|g" docker-compose.yml
                     sed -i "s|NEXT_PUBLIC_DOMAIN: .*|NEXT_PUBLIC_DOMAIN: ${{ secrets.FRONT_URL }}|g" docker-compose.yml
                     sed -i "s|GF_SECURITY_ADMIN_USER: .*|GF_SECURITY_ADMIN_USER: ${{ secrets.FRONT_URL }}|g" docker-compose.yml
