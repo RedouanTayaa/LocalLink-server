@@ -40,7 +40,7 @@ services:
             - ../api/var:/app/var
             - caddy_data:/data
             - caddy_config:/config
-            - ./backend/.env.local:/var/www/html/.env.local:ro
+            - ../api/.env.local:/app/.env.local:ro
         networks:
             - locallink-network
         depends_on:
