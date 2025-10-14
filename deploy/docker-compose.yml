@@ -141,7 +141,13 @@ services:
         user: USER_LOCAL
         volumes:
             - ../monitoring/loki-config.yaml:/etc/loki/local-config.yaml
-            - loki-data:/loki
+            - ../monitoring/loki/index:/loki/index
+            - ../monitoring/loki/cache:/loki/cache
+            - ../monitoring/loki/chunks:/loki/chunks
+            - ../monitoring/loki/compactor:/loki/compactor
+            - ../monitoring/loki/boltdb-shipper-cache:/loki/boltdb-shipper-cache
+            - ../monitoring/loki/boltdb-shipper-active:/loki/boltdb-shipper-active
+            - ../monitoring/loki/wal:/wal
         restart: always
         command: -config.file=/etc/loki/local-config.yaml
         networks:
@@ -181,7 +187,6 @@ volumes:
     caddy_data:
     caddy_config:
     prometheus-data:
-    loki-data:
 
 networks:
     locallink-network:
