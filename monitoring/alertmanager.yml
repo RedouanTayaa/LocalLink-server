@@ -3,6 +3,10 @@ global:
 
 route:
     receiver: "slack-notifications"
+    group_by: ['alertname', 'cluster', 'service']
+    group_wait: 10s
+    group_interval: 10s
+    repeat_interval: 12h
 
 receivers:
     - name: "slack-notifications"
@@ -10,3 +14,14 @@ receivers:
           - send_resolved: true
             api_url: "URL_SLACK_WEBHOOK"
             channel: "#alerts"
+            title: '{{ template "slack.default.title" . }}'
+            text: >-
+                {{ range .Alerts }}
+                  *Alert:* {{ .Labels.alertname }}
+                  *Severity:* {{ .Labels.severity }}
+                  *Summary:* {{ .Annotations.summary }}
+                  *Description:* {{ .Annotations.description }}
+                  {{ if .Labels.instance }}*Instance:* {{ .Labels.instance }}{{ end }}
+                  {{ if .Labels.name }}*Container:* {{ .Labels.name }}{{ end }}
+                {{ end }}
+            color: '{{ if eq .Status "firing" }}danger{{ else }}good{{ end }}'

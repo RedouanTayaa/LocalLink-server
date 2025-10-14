@@ -45,32 +45,42 @@ groups:
 
     - name: container-health
       rules:
-          # 🔴 Container arrêté (up=0 pour cadvisor metrics)
+          # 🔴 Container arrêté
           - alert: ContainerDown
-            expr: absent(container_last_seen{image!=""})
+            expr: up{job="cadvisor"} == 0
             for: 1m
             labels:
                 severity: critical
             annotations:
-                summary: "A container is missing"
-                description: "One or more containers have not been seen by cAdvisor for more than 1 minute."
+                summary: "cAdvisor is down"
+                description: "cAdvisor monitoring is not responding."
 
           # 🔴 Container consomme trop de CPU (> 80% pendant 5 min)
           - alert: ContainerHighCPU
-            expr: (rate(container_cpu_usage_seconds_total{image!=""}[5m]) * 100) > 0.8
+            expr: (rate(container_cpu_usage_seconds_total{image!="",name!=""}[5m]) * 100) > 80
             for: 5m
             labels:
                 severity: warning
             annotations:
                 summary: "High CPU usage for container {{ $labels.name }}"
-                description: "Container {{ $labels.name }} has used more than 80% CPU for the last 5 minutes."
+                description: "Container {{ $labels.name }} has used more than 80% CPU for the last 5 minutes ({{ $value | humanize }}%)."
 
-          # 🔴 Container consomme trop de mémoire (> 80%)
+          # 🔴 Container consomme trop de mémoire (> 80%
           - alert: ContainerHighMemory
-            expr: (container_memory_usage_bytes{image!=""} / container_spec_memory_limit_bytes{image!=""}) > 0.8
+            expr: (container_memory_usage_bytes{image!="",name!=""} / container_spec_memory_limit_bytes{image!="",name!=""}) * 100 > 80
             for: 5m
             labels:
                 severity: warning
             annotations:
                 summary: "High Memory usage for container {{ $labels.name }}"
-                description: "Container {{ $labels.name }} is using more than 80% of its memory limit."
+                description: "Container {{ $labels.name }} is using more than 80% of its memory limit ({{ $value | humanize }}%)."
+
+          # 🔴 Container redémarre souvent
+          - alert: ContainerRestarting
+            expr: rate(container_last_seen{name!=""}[5m]) > 0
+            for: 5m
+            labels:
+                severity: warning
+            annotations:
+                summary: "Container {{ $labels.name }} is restarting"
+                description: "Container {{ $labels.name }} has restarted multiple times in the last 5 minutes."
