@@ -144,6 +144,8 @@ services:
             - ../monitoring/loki/index:/loki/index
             - ../monitoring/loki/cache:/loki/cache
             - ../monitoring/loki/chunks:/loki/chunks
+            - ../monitoring/loki/compactor:/loki/compactor
+            - ../monitoring/loki/boltdb-shipper-cache:/loki/boltdb-shipper-cache
             - ../monitoring/loki/wal:/wal
         restart: always
         command: -config.file=/etc/loki/local-config.yaml
