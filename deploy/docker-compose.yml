@@ -148,6 +148,7 @@ services:
             - ../monitoring/loki/boltdb-shipper-cache:/loki/boltdb-shipper-cache
             - ../monitoring/loki/boltdb-shipper-active:/loki/boltdb-shipper-active
             - ../monitoring/loki/wal:/wal
+            - ../monitoring/loki/wal:/loki/wal
         restart: always
         command: -config.file=/etc/loki/local-config.yaml
         networks:
