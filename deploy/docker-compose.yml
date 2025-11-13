@@ -110,10 +110,21 @@ services:
             - /dev/disk/:/dev/disk:ro
         restart: always
         privileged: true
+        deploy:
+            resources:
+                limits:
+                    memory: 256M
+                    cpus: '0.5'
+                reservations:
+                    memory: 128M
         devices:
             - /dev/kmsg
         networks:
             - locallink-network
+        command:
+            - '--housekeeping_interval=30s'
+            - '--max_housekeeping_interval=60s'
+            - '--disable_metrics=percpu,sched,tcp,udp,accelerator,hugetlb,resctrl'
 
     prometheus:
         image: prom/prometheus:v3.5.0
