@@ -44,6 +44,7 @@ services:
         environment:
             APP_ENV: prod
             APP_DEBUG: 0
+            APP_RUNTIME: Runtime\FrankenPhpSymfony\Runtime
         volumes:
             - ../api/var:/app/var
             - caddy_data:/data
