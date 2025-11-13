@@ -77,7 +77,7 @@ jobs:
                   
                     # Redémarrer grafana en supprimant la bdd pour éviter des problèmes d'accès
                     docker compose rm -f grafana
-                    rm /srv/monitoring/grafana/grafana.db
+                    rm $SERVER_PATH/../monitoring/grafana/grafana.db
                     docker compose up -d grafana
                   
                     # Afficher le statut des services
