@@ -65,22 +65,22 @@ groups:
                 summary: "High CPU usage for container {{ $labels.name }}"
                 description: "Container {{ $labels.name }} has used more than 80% CPU for the last 5 minutes ({{ $value | humanize }}%)."
 
-          # 🔴 Container consomme trop de mémoire (> 80%
+          # 🔴 Container consomme trop de mémoire (> 80%)
           - alert: ContainerHighMemory
-            expr: (container_memory_usage_bytes{image!="",name!=""} / container_spec_memory_limit_bytes{image!="",name!=""}) * 100 > 80
+            expr: (container_memory_working_set_bytes{image!="",name!=""} / container_spec_memory_limit_bytes{image!="",name!=""}) * 100 > 80
             for: 5m
             labels:
                 severity: warning
             annotations:
                 summary: "High Memory usage for container {{ $labels.name }}"
-                description: "Container {{ $labels.name }} is using more than 80% of its memory limit ({{ $value | humanize }}%)."
+                description: "Container {{ $labels.name }} is using {{ $value | humanize1024 }}% of its memory limit."
 
           # 🔴 Container redémarre souvent
           - alert: ContainerRestarting
-            expr: rate(container_last_seen{name!=""}[5m]) > 0
+            expr: rate(container_start_time_seconds{name!=""}[5m]) > 0.01
             for: 5m
             labels:
                 severity: warning
             annotations:
-                summary: "Container {{ $labels.name }} is restarting"
-                description: "Container {{ $labels.name }} has restarted multiple times in the last 5 minutes."
+                summary: "Container {{ $labels.name }} is restarting frequently"
+                description: "Container {{ $labels.name }} has restarted {{ $value | humanize }} times per second over the last 5 minutes."

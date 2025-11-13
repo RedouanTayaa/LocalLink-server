@@ -75,6 +75,11 @@ jobs:
                     # Nettoyer les images non utilisées
                     docker image prune -f
                   
+                    # Redémarrer grafana en supprimant la bdd pour éviter des problèmes d'accès
+                    docker compose rm -f grafana
+                    rm /srv/monitoring/grafana/grafana.db
+                    docker compose up -d grafana
+                  
                     # Afficher le statut des services
                     docker compose ps
                   ENDSSH
