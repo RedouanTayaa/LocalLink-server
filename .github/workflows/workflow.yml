@@ -76,6 +76,7 @@ jobs:
                     docker image prune -f
                   
                     # Redémarrer grafana en supprimant la bdd pour éviter des problèmes d'accès
+                    docker compose stop grafana
                     docker compose rm -f grafana
                     rm $SERVER_PATH/../monitoring/grafana/grafana.db
                     docker compose up -d grafana

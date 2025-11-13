@@ -12,12 +12,20 @@ services:
         environment:
             REGISTRY_STORAGE_DELETE_ENABLED: "true"
             REGISTRY_STORAGE_CACHE_BLOBDESCRIPTOR: "inmemory"
+            REGISTRY_STORAGE_CACHE_BLOBDESCRIPTORSIZE: "10000"
             REGISTRY_VALIDATION_DISABLED: "true"
             REGISTRY_LOG_LEVEL: "info"
         volumes:
             - ../registry:/var/lib/registry
         networks:
             - locallink-network
+        deploy:
+            resources:
+                limits:
+                    memory: 512M      # Limite max
+                    cpus: '0.5'       # 50% d'un CPU
+                reservations:
+                    memory: 128M      # Minimum garanti
         healthcheck:
             test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5000/v2/" ]
             interval: 10s
