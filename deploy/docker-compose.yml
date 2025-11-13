@@ -124,7 +124,7 @@ services:
         command:
             - '--housekeeping_interval=30s'
             - '--max_housekeeping_interval=60s'
-            - '--disable_metrics=percpu,sched,tcp,udp,accelerator,hugetlb,resctrl'
+            - '--disable_metrics=percpu,sched,tcp,udp,hugetlb,resctrl'
 
     prometheus:
         image: prom/prometheus:v3.5.0
