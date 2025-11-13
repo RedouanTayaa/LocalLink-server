@@ -43,6 +43,8 @@ services:
             - "127.0.0.1:8080:80"
         environment:
             APP_ENV: prod
+            APP_DEBUG: 0
+            FRANKENPHP_CONFIG: "worker ./public/index.php 2"
         volumes:
             - ../api/var:/app/var
             - caddy_data:/data
@@ -74,6 +76,13 @@ services:
             NODE_ENV: production
             NEXT_PUBLIC_API_URL: API_URL
             NEXT_PUBLIC_DOMAIN: FRONT_URL
+        deploy:
+            resources:
+                limits:
+                    memory: 256M
+                    cpus: '0.5'
+                reservations:
+                    memory: 128M
         networks:
             - locallink-network
         depends_on:
@@ -95,6 +104,13 @@ services:
             - /proc:/host/proc:ro
             - /sys:/host/sys:ro
             - /:/rootfs:ro
+        deploy:
+            resources:
+                limits:
+                    memory: 64M
+                    cpus: '0.25'
+                reservations:
+                    memory: 32M
         networks:
             - locallink-network
 
@@ -137,7 +153,16 @@ services:
         command:
             - '--config.file=/etc/prometheus/prometheus.yml'
             - '--storage.tsdb.path=/prometheus'
+            - '--storage.tsdb.retention.time=7d'
+            - '--storage.tsdb.retention.size=8GB'
         restart: always
+        deploy:
+            resources:
+                limits:
+                    memory: 512M
+                    cpus: '1.0'
+                reservations:
+                    memory: 256M
         networks:
             - locallink-network
 
@@ -154,6 +179,13 @@ services:
         environment:
             GF_SECURITY_ADMIN_USER: GF_ADMIN_USER
             GF_SECURITY_ADMIN_PASSWORD: GF_ADMIN_PASSWORD
+        deploy:
+            resources:
+                limits:
+                    memory: 256M
+                    cpus: '0.5'
+                reservations:
+                    memory: 128M
         networks:
             - locallink-network
         depends_on:
@@ -175,6 +207,13 @@ services:
             - ../monitoring/loki/wal:/loki/wal
         restart: always
         command: -config.file=/etc/loki/local-config.yaml
+        deploy:
+            resources:
+                limits:
+                    memory: 512M
+                    cpus: '1.0'
+                reservations:
+                    memory: 256M
         networks:
             - locallink-network
 
@@ -190,6 +229,13 @@ services:
             - --server.http.listen-addr=0.0.0.0:12345
             - /etc/alloy/config.alloy
         restart: always
+        deploy:
+            resources:
+                limits:
+                    memory: 128M
+                    cpus: '0.25'
+                reservations:
+                    memory: 64M
         networks:
             - locallink-network
         depends_on:
@@ -205,6 +251,13 @@ services:
             - ../monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
         command:
             - '--config.file=/etc/alertmanager/alertmanager.yml'
+        deploy:
+            resources:
+                limits:
+                    memory: 128M      # ⭐ Ajout
+                    cpus: '0.25'
+                reservations:
+                    memory: 64M
         networks:
             - locallink-network
 
