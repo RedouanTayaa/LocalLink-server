@@ -44,12 +44,12 @@ services:
         environment:
             APP_ENV: prod
             APP_DEBUG: 0
-            FRANKENPHP_CONFIG: "worker ./public/index.php 2"
         volumes:
             - ../api/var:/app/var
             - caddy_data:/data
             - caddy_config:/config
             - ../api/.env.local:/app/.env.local:ro
+            - ../secrets/jwt:/app/config/jwt:ro
         deploy:
             resources:
                 limits:
