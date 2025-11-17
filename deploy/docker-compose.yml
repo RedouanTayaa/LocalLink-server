@@ -233,10 +233,10 @@ services:
         deploy:
             resources:
                 limits:
-                    memory: 128M
+                    memory: 256M
                     cpus: '0.25'
                 reservations:
-                    memory: 64M
+                    memory: 128M
         networks:
             - locallink-network
         depends_on:
